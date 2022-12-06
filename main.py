@@ -1,4 +1,7 @@
+from dino_runner.components.game import Game
 
 
 if __name__ == "__main__":
-     print("Hello world")
+    # print("Hello world...")
+    game = Game()
+    game.run()
