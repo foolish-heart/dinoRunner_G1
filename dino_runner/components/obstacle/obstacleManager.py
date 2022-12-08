@@ -16,7 +16,19 @@ class ObstacleManager():
                 pygame.time.delay(500)
                 game.playing = False
                 #break
-                game.death_count = game.death_count + 1
+                #game.death_count = game.death_count + 1
+                pygame.time.delay(100)
+                self.obstacles = []
+
+                game.player_heart_manager.reduce_heart()
+                if game.player_heart_manager.heart_count > 0:
+                    game.player.show_text = False
+                    
+                else:
+                    pygame.time.delay(500)
+                    game.playing = False
+                    game.death_count = game.death_count + 1
+                    break
 
     def draw(self, screen):
         for obstacle in self.obstacles:

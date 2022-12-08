@@ -3,6 +3,7 @@ from dino_runner.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, T
 from dino_runner.components.dinosaur.dinosaur import Dinosaur
 from dino_runner.components.obstacle.obstacleManager import ObstacleManager
 from dino_runner.components.score.text_utils import *
+from dino_runner.components.player_hearts.player_heart_manager import PlayerHeartManager
 
 class Game:
     def __init__(self):
@@ -21,9 +22,12 @@ class Game:
         self.points = 0
         self.death_count = 0
         self.running = True
+        self.player_heart_manager = PlayerHeartManager()
+        self.show_text = False
 
     def run(self):
         self.obstacle_manager.reset_obstacle(self)
+        self.player_heart_manager.reduce_heart()
         self.playing = True
         while self.playing:
             self.events()
@@ -49,6 +53,7 @@ class Game:
         self.player.draw(self.screen)
         self.obstacle_manager.draw(self.screen)
         self.score()
+        self.player_heart_manager.draw(self.screen)
         pygame.display.update()
         pygame.display.flip()
 
@@ -87,7 +92,7 @@ class Game:
         if death_count == 0:
             text, text_rect = get_centered_message('Press any key to start')
             self.screen.blit(text, text_rect)
-        elif death_count > 0:
+        elif death_count < 0:
             text, text_rect = get_centered_message('Press any key to restart')
             score, score_rect = get_centered_message('Your score: ' + str(self.points), height = half_screem_height + 50)
             self.screen.blit(score, score_rect)
