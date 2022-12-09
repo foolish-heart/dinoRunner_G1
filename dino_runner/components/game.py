@@ -4,6 +4,8 @@ from dino_runner.components.dinosaur.dinosaur import Dinosaur
 from dino_runner.components.obstacle.obstacleManager import ObstacleManager
 from dino_runner.components.score.text_utils import *
 from dino_runner.components.player_hearts.player_heart_manager import PlayerHeartManager
+from dino_runner.components.powerup.powerupManager import PowerUpManager
+
 
 class Game:
     def __init__(self):
@@ -18,6 +20,7 @@ class Game:
         self.y_pos_bg = 380
         self.player = Dinosaur()
         self.obstacle_manager = ObstacleManager()
+        self
 
         self.points = 0
         self.death_count = 0
@@ -25,9 +28,12 @@ class Game:
         self.player_heart_manager = PlayerHeartManager()
         self.show_text = False
 
+        self.power_up_manager = PowerUpManager()
+
     def run(self):
         self.obstacle_manager.reset_obstacle(self)
-        self.player_heart_manager.reduce_heart()
+        self.player_heart_manager.reset_hearts()
+        self.power_up_manager.reset_power_ups(self.points)
         self.playing = True
         while self.playing:
             self.events()
@@ -45,6 +51,7 @@ class Game:
         user_input = pygame.key.get_pressed()
         self.player.update(user_input)
         self.obstacle_manager.update(self)
+        self.power_up_manager.update(self.points, self.game_speed, self.player)
 
     def draw(self):
         self.clock.tick(FPS)
@@ -52,6 +59,7 @@ class Game:
         self.draw_background()
         self.player.draw(self.screen)
         self.obstacle_manager.draw(self.screen)
+        self.power_up_manager.draw(self.screen)
         self.score()
         self.player_heart_manager.draw(self.screen)
         pygame.display.update()
@@ -74,6 +82,7 @@ class Game:
 
         score, score_rect = get_score_element(self.points)
         self.screen.blit(score, score_rect)
+        self.player.check_invisivility(self.screen)
 
     def show_menu(self):
         self.running = True
@@ -94,9 +103,12 @@ class Game:
             self.screen.blit(text, text_rect)
         elif death_count < 0:
             text, text_rect = get_centered_message('Press any key to restart')
-            score, score_rect = get_centered_message('Your score: ' + str(self.points), height = half_screem_height + 50)
+            score, score_rect = get_centered_message(' Your score: ' + str(self.points), height = half_screem_height + 50)
+            death, death_rect = get_centered_message(' Dino death: ' + str(self.death_count), height = half_screem_height + 100)
+
             self.screen.blit(score, score_rect)
             self.screen.blit(text, text_rect)
+            self.screen.blit(death, death_rect)
 
     def handle_keys_events_on_menu(self):
         for event in pygame.event.get():
@@ -106,5 +118,5 @@ class Game:
                 self.playing = False
                 pygame.quit()
                 exit()
-            if(event.type == pygame.KEYDOWN):
+            if (event.type == pygame.KEYDOWN):
                 self.run()
